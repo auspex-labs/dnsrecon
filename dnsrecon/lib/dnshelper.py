@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #    Copyright (C) 2020  Carlos Perez
@@ -49,6 +49,8 @@ class DnsHelper:
         self._res = dns.resolver.Resolver(configure=configure)
 
         if ns_server:
+            if isinstance(ns_server, str):
+                ns_server = [ns_server]
             self._res.nameservers = ns_server
             if len(ns_server) > 1:
                 self._res.rotate = True
@@ -265,7 +267,7 @@ class DnsHelper:
 
         result = []
         for answer in answers:
-            strings_ = bytes.join(b'', answer.strings).decode('utf-8')
+            strings_ = bytes.join(b'', answer.strings).decode('utf-8', errors='ignore')
             result.append(['SPF', strings_])
 
         return result
@@ -286,7 +288,7 @@ class DnsHelper:
                 continue
 
             for answer in answers:
-                strings_ = bytes.join(b'', answer.strings).decode('utf-8')
+                strings_ = bytes.join(b'', answer.strings).decode('utf-8', errors='ignore')
                 result.append(['TXT', target_, strings_])
 
         return result
@@ -529,7 +531,7 @@ class DnsHelper:
                                                  'weight': weight_})
                             continue
 
-                        for type_, name, addr_ in ip_list:
+                        for type_, name_, addr_ in ip_list:
                             if type_ in ['A', 'AAAA']:
                                 print_status(f"\t SRV {fqdn_} {target} {port_} {weight_} {addr_}")
                                 zone_records.append({'zone_server': ns_srv, 'type': 'SRV',

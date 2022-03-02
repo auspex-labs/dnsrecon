@@ -1,4 +1,4 @@
-name: DNSrecon Python CI
+name: DNSrecon CI
 
 on:
   push:
@@ -10,11 +10,12 @@ on:
     - '*'
 jobs:
   Python:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 4
+      max-parallel: 8
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9, 3.10.0]
 
     steps:
     - uses: actions/checkout@v2
@@ -34,6 +35,6 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero  --max-line-length=127 --statistics
     
-    - name: Test with pytest
+    - name: Run pytest tests
       run: |
         python3 -m pytest .
